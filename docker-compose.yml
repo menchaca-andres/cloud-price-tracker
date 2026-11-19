@@ -11,18 +11,18 @@ services:
     networks:
       - price-tracker-net
 
-    # para ver tablas e items en localhost:8001
-    dynamodb-admin:
-      image: aaronshaf/dynamodb-admin:latest
-      container_name: dynamodb-admin
-      environment:
-        - DYNAMO_ENDPOINT=http://dynamodb-local:8000
-      ports:
-        - "8001:8001"
-      depends_on:
-        - dynamodb-local
-      networks:
-        - price-tracker-net
+  # para ver tablas e items en localhost:8001
+  dynamodb-admin:
+    image: aaronshaf/dynamodb-admin:latest
+    container_name: dynamodb-admin
+    environment:
+      - DYNAMO_ENDPOINT=http://dynamodb-local:8000
+    ports:
+      - "8001:8001"
+    depends_on:
+      - dynamodb-local
+    networks:
+      - price-tracker-net
 
 networks:
   price-tracker-net:
