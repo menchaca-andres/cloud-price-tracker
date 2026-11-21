@@ -1,13 +1,20 @@
 import { ProductoExtraido } from "./extraer";
 import { docClient } from "./config/dynamo";
-import { PutCommand } from "@aws-sdk/lib-dynamodb";
+import { PutCommand, ScanCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
 
-async function procesarProducto(id_historial: string, url: string, precioObjetivo: number) {
-    console.log(`Procesando producto ID: ${id_historial}`);
+interface Producto {
+    id_producto: string;
+    url: string;
+    precio_objetivo: number;
+    usuario_email?: string;
+}
+
+async function procesarProducto(producto: Producto) {
+    console.log(`Procesando producto ID: ${producto.id_producto}`);
 
     try {
         // extraer datos con playwright
-        const datos = await ProductoExtraido(url);
+        const datos = await ProductoExtraido(producto.url);
         const timestamp = new Date().toISOString();
 
         console.log(`${datos.titulo}, | ${datos.precio} | ${datos.moneda}`);
@@ -17,7 +24,7 @@ async function procesarProducto(id_historial: string, url: string, precioObjetiv
             new PutCommand({
                 TableName: "HISTORIAL_PRECIOS",
                 Item: {
-                    id_historial,
+                    id_historial: producto.id_producto,
                     timestamp,
                     precio: datos.precio,
                     moneda: datos.moneda,
@@ -26,28 +33,58 @@ async function procesarProducto(id_historial: string, url: string, precioObjetiv
                 }
             })
         );
-        console.log("Historial guardado en DynamoDB con éxito");
+
+        await docClient.send(
+            new UpdateCommand({
+                TableName: "PRODUCTOS",
+                Key: { id_producto: producto.id_producto },
+                UpdateExpression: "SET precio_actual = :precio, titulo = :titulo, moneda = :moneda, ultima_revision = :fecha",
+                ExpressionAttributeValues: {
+                    ":precio": datos.precio,
+                    ":titulo": datos.titulo,
+                    ":moneda": datos.moneda,
+                    ":fecha": timestamp
+                }
+            })
+        );
+        console.log("Historial guardado y producto actualizado en DynamoDB");
 
         // reglas de negocio
-        if (datos.precio <= precioObjetivo) {
-            console.log(`Con oferta! Precio actual (${datos.precio}) <= Precio objetivo (${precioObjetivo})`);
-            console.log(`Notificación simulada enviada al usuario`);
+        if (datos.precio <= producto.precio_objetivo) {
+            console.log(`Con oferta! Precio actual (${datos.precio}) <= Precio objetivo (${producto.precio_objetivo})`);
+            console.log(`Notificación simulada enviada a ${producto.usuario_email}`);
         } else {
-            console.log(`Sin oferta! recio actual (${datos.precio}) > Precio objetivo (${precioObjetivo})`);
+            console.log(`Sin oferta! recio actual (${datos.precio}) > Precio objetivo (${producto.precio_objetivo})`);
         }
     } catch (error) {
-        console.log("Error al procesar el producto:", error);
+        console.log(`Error al procesar el producto ${producto.id_producto}:`, error);
     }
 }
 
-// producto simulado
 async function main() {
-    const testProductoId = "prod-101";
-    const testUrl = "https://books.toscrape.com/catalogue/a-light-in-the-attic_1000/index.html";
-    const testPrecioObjetivo = 60;
-    console.log("Iniciando prueba del worker de extracción");
+    console.log("Iniciando barrido de productos activos");
 
-    await procesarProducto(testProductoId, testUrl, testPrecioObjetivo);
+    try {
+        const respuesta = await docClient.send(
+            new ScanCommand({
+                TableName: "PRODUCTOS",
+                FilterExpression: "estado = :activo",
+                ExpressionAttributeValues: {
+                    ":activo": "ACTIVO"
+                }
+            })
+        );
+
+        const productos = (respuesta.Items as Producto[]) || [];
+
+        for (const producto of productos) {
+            await procesarProducto(producto);
+        }
+
+        console.log("Barrido de productos finalizado");
+    } catch (error) {
+        console.log("Error al consultar la tabla PRODUCTOS:", error);
+    }
 }
 
 main();
