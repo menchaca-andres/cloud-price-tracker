@@ -1,0 +1,23 @@
+<section class="card-historial-precio">
+    <h2>Historial: {{ producto().titulo || producto().id_producto }}</h2>
+    @if (historial().length === 0) {
+    <p>Todavía no hay puntos registrados en HISTORIAL DE PRECIOS.</p>
+    } @else {
+    <table>
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Precio</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (h of historial(); track h.timestamp) {
+            <tr>
+                <td>{{ h.timestamp | date:'short' }}</td>
+                <td><strong>{{ h.precio }} {{ h.moneda }}</strong></td>
+            </tr>
+            }
+        </tbody>
+    </table>
+    }
+</section>
