@@ -1,0 +1,18 @@
+services:
+  backend:
+    image: 834788437299.drk.ecr.us-east-1.amazonaws.com/price-tracker-backend:latest
+    container_name: price-tracker-backend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - AWS_REGION=us-east-1
+
+  worker:
+    image: 834788437299.drk.ecr.us-east-1.amazonaws.com/price-tracker-worker:latest
+    container_name: price-tracker-worker
+    restart: unless-stopped
+    environment:
+      - AWS_REGION=us-east-1
+      - SNS_TOPIC_ARN=arn:aws:sns:us-east-1:834788437299:PriceTrackerAlerts
