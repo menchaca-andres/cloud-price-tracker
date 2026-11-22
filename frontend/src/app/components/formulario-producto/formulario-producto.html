@@ -1,0 +1,14 @@
+<section>
+    <h2>Registrar nuevo producto</h2>
+    <form (ngSubmit)="enviar()" class="form-grid">
+        <input type="url" [(ngModel)]="url" placeholder="https://tienda.com/producto" required>
+        <input type="number" [(ngModel)]="precioObjetivo" name="precio" placeholder="Precio objetivo" required>
+        <select name="moneda" [(ngModel)]="moneda">
+            <option value="USD">USD</option>
+            <option value="BOB">BOB</option>
+            <option value="GBP">GBP</option>
+            <option value="EUR">EUR</option>
+        </select>
+        <button type="submit">Rastrear</button>
+    </form>
+</section>
