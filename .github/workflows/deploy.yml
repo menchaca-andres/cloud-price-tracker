@@ -53,7 +53,7 @@ jobs:
         SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
       run: |
         mkdir -p ~/.ssh
-        echo "SSH_KEY" > ~/.ssh/ec2_key.pem
+        echo "$SSH_KEY" > ~/.ssh/ec2_key.pem
         chmod 600 ~/.ssh/ec2_key.pem
         scp -o StrictHostKeyChecking=no -i ~/.ssh/ec2_key.pem docker-compose.prod.yml ubuntu@${{ env.EC2_HOST }}:~/docker-compose.prod.yml
         ssh -o StrictHostKeyChecking=no -i ~/.ssh/ec2_key.pem ubuntu@${{ env.EC2_HOST }} << 'EOF'
