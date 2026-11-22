@@ -57,6 +57,7 @@ jobs:
         chmod 600 ~/.ssh/ec2_key.pem
         scp -o StrictHostKeyChecking=no -i ~/.ssh/ec2_key.pem docker-compose.prod.yml ubuntu@${{ env.EC2_HOST }}:~/docker-compose.prod.yml
         ssh -o StrictHostKeyChecking=no -i ~/.ssh/ec2_key.pem ubuntu@${{ env.EC2_HOST }} << 'EOF'
+          set -e
           aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 834788437299.dkr.ecr.us-east-1.amazonaws.com
           docker compose -f docker-compose.prod.yml pull
           docker compose -f docker-compose.prod.yml up -d backend
