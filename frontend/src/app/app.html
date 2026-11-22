@@ -1,0 +1,15 @@
+<main class="container">
+  <header>
+    <h1>Cloud Price Tracker</h1>
+    <p>Monitoreo inteligente de precios y ofertas en AWS</p>
+  </header>
+
+  <app-formulario-producto (crearProducto)="onCrearProducto($event)" />
+
+  <app-lista-producto [productos]="productos()" [cargando]="cargando()" (actualizar)="cargarProductos()"
+    (seleccionar)="onVerHistorial($event)" />
+
+  @if (productoActivo(); as prod) {
+  <app-historial-precio [producto]="prod" [historial]="historialSeleccionado()" />
+  }
+</main>

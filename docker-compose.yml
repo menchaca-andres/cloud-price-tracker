@@ -1,0 +1,62 @@
+services:
+  dynamodb-local:
+    image: amazon/dynamodb-local:latest
+    container_name: dynamodb-local
+    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/home/dynamodblocal/data
+    working_dir: /home/dynamodblocal
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -s http://localhost:8000 > /dev/null || exit 1" ]
+      interval: 3s
+      timeout: 3s
+      retries: 5
+    networks:
+      - price-tracker-net
+
+  # para ver tablas e items en localhost:8001
+  dynamodb-admin:
+    image: aaronshaf/dynamodb-admin:latest
+    container_name: dynamodb-admin
+    environment:
+      - DYNAMO_ENDPOINT=http://dynamodb-local:8000
+    ports:
+      - "8001:8001"
+    depends_on:
+      - dynamodb-local
+    networks:
+      - price-tracker-net
+
+  worker:
+    build:
+      context: ./worker
+      dockerfile: Dockerfile
+    container_name: price-tracker-worker
+    env_file:
+      - ./worker/.env
+    depends_on:
+      dynamodb-local:
+        condition: service_healthy
+    networks:
+      - price-tracker-net
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: price-tracker-backend
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./backend/.env
+    depends_on:
+      dynamodb-local:
+        condition: service_healthy
+    networks:
+      - price-tracker-net
+
+networks:
+  price-tracker-net:
+    driver: bridge
