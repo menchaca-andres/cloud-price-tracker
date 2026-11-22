@@ -1,0 +1,32 @@
+<section class="card-lista-producto">
+    <div class="header-fila">
+        <h2>Productos monitoreados</h2>
+        <button class="btn-sec" (click)="actualizar.emit()">Actualizar</button>
+    </div>
+
+    @if (cargando()) {
+    <p>Cargando productos...</p>
+    } @else {
+    <div class="lista">
+        @for (prod of productos(); track prod.id_producto) {
+        <div class="item">
+            <div>
+                <strong>{{ prod.titulo || 'Pendiente de primera revisión' }}</strong>
+                <div class="url">{{ prod.url }}</div>
+                <small>Objetivo: {{ prod.precio_objetivo }} {{ prod.moneda }}</small>
+            </div>
+            <div class="acciones">
+                @if (prod.precio_actual != null) {
+                <span class="precio" [class.oferta]="prod.precio_actual <= prod.precio_objetivo">
+                    {{ prod.precio_actual }} {{ prod.moneda }}
+                    @if (prod.precio_actual <= prod.precio_objetivo) { (OFERTA) } </span>
+                        } @else {
+                        <span class="pendiente">Sin revisar</span>
+                        }
+                        <button class="btn-sec" (click)="seleccionar.emit(prod)">Ver historial</button>
+            </div>
+        </div>
+        }
+    </div>
+    }
+</section>
