@@ -74,19 +74,19 @@ cloud-price-tracker/
 ### 1. Configurar variables de entorno locales
 Crear `backend/.env`:
 ```env
-PORT=3000
-AWS_REGION=us-east-1
+PORT=
+AWS_REGION=
 DYNAMODB_ENDPOINT=http://localhost:8000
-AWS_ACCESS_KEY_ID=keyAydee
-AWS_SECRET_ACCESS_KEY=secretKeyAydee
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
 ```
 
 Crear `worker/.env`:
 ```env
-AWS_REGION=us-east-1
-DYNAMODB_ENDPOINT=http://dynamodb-local:8000
-AWS_ACCESS_KEY_ID=keyAydee
-AWS_SECRET_ACCESS_KEY=secretKeyAydee
+AWS_REGION=
+DYNAMODB_ENDPOINT=
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
 ```
 
 ### 2. Levantar servicios con Docker Compose
