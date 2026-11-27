@@ -15,3 +15,4 @@ services:
     environment:
       - AWS_REGION=us-east-1
       - SNS_TOPIC_ARN=arn:aws:sns:us-east-1:834788437299:PriceTrackerAlerts
+      - S3_BUCKET_NAME=cloud-price-tracker-frontend
