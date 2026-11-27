@@ -1,4 +1,7 @@
 import { chromium } from "playwright";
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+
+const s3Client = new S3Client({ region: process.env.AWS_REGION });
 
 export interface DatosExtraidos {
   titulo: string;
@@ -144,8 +147,24 @@ export async function ProductoExtraido(url: string): Promise<DatosExtraidos> {
     const precioNumerico = parsearPrecio(resultado.precioRaw);
     const monedaFinal = resultado.moneda || detectarMoneda(resultado.precioRaw);
 
-    const captura_ruta = `captura-${Date.now()}.png`;
-    await pagina.screenshot({ path: captura_ruta });
+    const nombreArchivo = `captura-${Date.now()}.png`;
+    let captura_ruta = nombreArchivo;
+    const bucket = process.env.S3_BUCKET_NAME;
+
+    if (bucket) {
+      const buffer = await pagina.screenshot();
+      const key = `capturas/${nombreArchivo}`;
+      await s3Client.send(new PutObjectCommand({
+        Bucket: bucket,
+        Key: key,
+        Body: buffer,
+        ContentType: "image/png"
+      }));
+      const region = process.env.AWS_REGION;
+      captura_ruta = `https://${bucket}.s3.${region}.amazonaws.com/${key}`;
+    } else {
+      await pagina.screenshot({ path: nombreArchivo });
+    }
 
     return {
       titulo: resultado.titulo,
