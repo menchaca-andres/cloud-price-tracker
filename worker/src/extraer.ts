@@ -152,6 +152,14 @@ export async function ProductoExtraido(url: string): Promise<DatosExtraidos> {
     const bucket = process.env.S3_BUCKET_NAME;
 
     if (bucket) {
+      await pagina.keyboard.press('Escape').catch(() => { });
+      const btnCerrar = pagina.locator('button:has-text("Confirmar"), button[aria-label="Close"], ,vtex-modal-layout-0-x-closeButton').first();
+
+      if (await btnCerrar.isVisible({ timeout: 500 }).catch(() => false)) {
+        await btnCerrar.click().catch(() => { });
+        await pagina.waitForTimeout(300);
+      }
+
       const buffer = await pagina.screenshot();
       const key = `capturas/${nombreArchivo}`;
       await s3Client.send(new PutObjectCommand({
