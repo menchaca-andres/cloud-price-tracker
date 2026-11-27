@@ -72,22 +72,7 @@ cloud-price-tracker/
 * [Bun](https://bun.sh/)
 
 ### 1. Configurar variables de entorno locales
-Crear `backend/.env`:
-```env
-PORT=
-AWS_REGION=
-DYNAMODB_ENDPOINT=http://localhost:8000
-AWS_ACCESS_KEY_ID=
-AWS_SECRET_ACCESS_KEY=
-```
-
-Crear `worker/.env`:
-```env
-AWS_REGION=
-DYNAMODB_ENDPOINT=
-AWS_ACCESS_KEY_ID=
-AWS_SECRET_ACCESS_KEY=
-```
+Crear los archivos `backend/.env` y `worker/.env` (ignorados por Git) con las variables `PORT`, `AWS_REGION`, `DYNAMODB_ENDPOINT`, `AWS_ACCESS_KEY_ID` y `AWS_SECRET_ACCESS_KEY` apuntando al contenedor `dynamodb-local`.
 
 ### 2. Levantar servicios con Docker Compose
 ```bash

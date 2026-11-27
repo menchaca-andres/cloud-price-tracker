@@ -21,4 +21,5 @@ export interface PuntoHistorial {
   precio: number;
   moneda: string;
   titulo: string;
+  captura_ruta?: string;
 }

@@ -8,6 +8,7 @@
             <tr>
                 <th>Fecha</th>
                 <th>Precio</th>
+                <th>Evidencia</th>
             </tr>
         </thead>
         <tbody>
@@ -15,6 +16,13 @@
             <tr>
                 <td>{{ h.timestamp | date:'short' }}</td>
                 <td><strong>{{ h.precio }} {{ h.moneda }}</strong></td>
+                <td>
+                    @if (h.captura_ruta?.startsWith('http')) {
+                    <a href="{{ h.captura_ruta }}" target="_blank">Ver captura</a>
+                    } @else {
+                    <span>Local</span>
+                    }
+                </td>
             </tr>
             }
         </tbody>
